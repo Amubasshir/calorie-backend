@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import {
   getMe,
   googleAuth,
@@ -7,13 +7,17 @@ import {
   register,
 } from "../controllers/auth.controller";
 import { authenticateJWT } from "../middlewares/auth";
+import { validateLogin, validateRegister } from "../middlewares/validators";
 
 const router = Router();
 
-router.post("/register", register);
-router.post("/login", login);
-router.get("/me", authenticateJWT, getMe);
-router.get("/google", googleAuth);
-router.get("/google/callback", googleCallback);
+// Local auth routes
+router.post("/register", validateRegister as RequestHandler[], register as RequestHandler);
+router.post("/login", validateLogin as RequestHandler[], login as RequestHandler);
+router.get("/me", authenticateJWT as RequestHandler, getMe as RequestHandler);
+
+// Google OAuth routes
+router.get("/google", googleAuth as RequestHandler);
+router.get("/google/callback", googleCallback as RequestHandler);
 
 export default router;

@@ -1,6 +1,25 @@
+import { OAuth2Client } from "google-auth-library";
 import request from "supertest";
+import config from "../../config/config";
 import { User } from "../../models/user.model";
 import { app } from "../../server";
+
+jest.mock("google-auth-library", () => ({
+  OAuth2Client: jest.fn().mockImplementation(() => ({
+    generateAuthUrl: jest.fn().mockReturnValue("https://google.com/auth"),
+    getToken: jest.fn().mockResolvedValue({
+      tokens: { id_token: "mock_id_token" },
+    }),
+    verifyIdToken: jest.fn().mockResolvedValue({
+      getPayload: () => ({
+        sub: "123456789",
+        name: "Google User",
+        email: "google@example.com",
+        picture: "https://example.com/photo.jpg",
+      }),
+    }),
+  })),
+}));
 
 describe("Auth API", () => {
   const testUser = {
@@ -99,6 +118,39 @@ describe("Auth API", () => {
       const res = await request(app).get("/api/auth/me").expect(401);
 
       expect(res.body.success).toBe(false);
+    });
+  });
+  describe("Google OAuth", () => {
+    const mockGoogleUser = {
+      sub: "123456789",
+      name: "Google User",
+      email: "google@example.com",
+      picture: "https://example.com/photo.jpg",
+    };
+
+    beforeEach(() => {
+      // The mock is already set up in the jest.mock call above
+      jest.clearAllMocks();
+    });
+
+    it("should redirect to Google auth URL", async () => {
+      const res = await request(app).get("/api/auth/google").expect(302);
+
+      expect(res.header.location).toContain("https://google.com/auth");
+    });
+
+    it("should handle Google callback and create user", async () => {
+      const res = await request(app)
+        .get("/api/auth/google/callback")
+        .query({ code: "mock_auth_code" })
+        .expect(302);
+
+      expect(res.header.location).toContain(config.clientUrl);
+      expect(res.header.location).toContain("token=");
+
+      const user = await User.findOne({ email: mockGoogleUser.email });
+      expect(user).toBeTruthy();
+      expect(user?.googleId).toBe(mockGoogleUser.sub);
     });
   });
 });

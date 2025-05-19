@@ -1,16 +1,15 @@
 import bcrypt from "bcryptjs";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt from "jsonwebtoken";
-import passport from "passport";
+import config from "../config/config";
 import { User } from "../models/user.model";
+import {
+  createOrUpdateGoogleUser,
+  getGoogleAuthURL,
+  getGoogleUser,
+} from "../services/google-auth.service";
 
-const JWT_SECRET = process.env.JWT_SECRET || "changeme";
-
-export const register = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const register: RequestHandler = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -38,11 +37,7 @@ export const register = async (
   }
 };
 
-export const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const login: RequestHandler = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select("+password");
@@ -64,11 +59,7 @@ export const login = async (
   }
 };
 
-export const getMe = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const getMe: RequestHandler = async (req, res, next) => {
   try {
     const user = await User.findById(req.user?.id).select("-password");
     if (!user) {
@@ -82,23 +73,39 @@ export const getMe = async (
 };
 
 // Google OAuth handlers
-export const googleAuth = passport.authenticate("google", {
-  scope: ["profile", "email"],
-}) as unknown as RequestHandler;
+export const googleAuth = (req: Request, res: Response): void => {
+  const url = getGoogleAuthURL();
+  res.redirect(url);
+};
 
-export const googleCallback = (
+export const googleCallback = async (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: "/login",
-  })(req, res, (err: any) => {
-    if (err) {
-      return next(err);
+): Promise<void> => {
+  try {
+    const code = req.query.code as string;
+    if (!code) {
+      res
+        .status(400)
+        .json({ success: false, message: "Authorization code missing" });
+      return;
     }
-    // Send success response
-    res.redirect(process.env.CLIENT_URL || "http://localhost:5173");
-  });
+
+    const googleUser = await getGoogleUser(code);
+    const user = await createOrUpdateGoogleUser(googleUser);
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      config.jwtSecret,
+      {
+        expiresIn: config.jwtExpiresIn,
+      }
+    );
+
+    // Redirect to frontend with token
+    res.redirect(`${config.clientUrl}?token=${token}`);
+  } catch (error) {
+    next(error);
+  }
 };

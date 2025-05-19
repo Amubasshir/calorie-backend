@@ -5,7 +5,6 @@ import express from "express";
 import helmet from "helmet";
 import mongoose from "mongoose";
 import morgan from "morgan";
-import passport from "./config/passport";
 import authRoutes from "./routes/auth.routes";
 
 // Load env vars
@@ -25,7 +24,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
 app.use(morgan("dev"));
-app.use(passport.initialize());
 
 // Routes
 app.use("/api/auth", authRoutes);
