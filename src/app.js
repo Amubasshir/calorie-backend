@@ -6,13 +6,13 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 
 // Local imports
-import adminRoutes from './routes/admin.routes.js';
+// import adminRoutes from './routes/admin.routes.js';
+// import diaryRoutes from './routes/diary.routes.js';
+// import foodRoutes from './routes/food.routes.js';
+// import imageRoutes from './routes/image.routes.js';
+// import imageAnalysisRoutes from './routes/imageAnalysis.routes.js';
+// import subscriptionRoutes from './routes/subscription.routes.js';
 import authRoutes from './routes/auth.routes.js';
-import diaryRoutes from './routes/diary.routes.js';
-import foodRoutes from './routes/food.routes.js';
-import imageRoutes from './routes/image.routes.js';
-import imageAnalysisRoutes from './routes/imageAnalysis.routes.js';
-import subscriptionRoutes from './routes/subscription.routes.js';
 import userRoutes from './routes/user.routes.js';
 import AppError from './utils/appError.js';
 
@@ -40,12 +40,12 @@ app.use(cookieParser());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/images', imageRoutes);
-app.use('/api/foods', foodRoutes);
-app.use('/api/vision', imageAnalysisRoutes);
-app.use('/api/diaries', diaryRoutes);
-app.use('/api/subscription', subscriptionRoutes);
+// app.use('/api/admin', adminRoutes);
+// app.use('/api/images', imageRoutes);
+// app.use('/api/foods', foodRoutes);
+// app.use('/api/vision', imageAnalysisRoutes);
+// app.use('/api/diaries', diaryRoutes);
+// app.use('/api/subscription', subscriptionRoutes);
 
 // 404 handler
 app.all('*', (req, res, next) => {
