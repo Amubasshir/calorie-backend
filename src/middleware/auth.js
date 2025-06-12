@@ -7,6 +7,8 @@ export const protect = async (req, res, next) => {
         // 1) Get token from cookies
         const token = req.cookies.jwt;
 
+        console.log({token});
+
         if (!token) {
             return next(new AppError('You are not logged in. Please log in to get access.', 401));
         }

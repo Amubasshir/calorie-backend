@@ -111,6 +111,33 @@ export const getFoods = async (req, res, next) => {
   }
 };
 
+export const getFoodsCategories = async (req, res, next) => {
+  try {
+    const categories = await Food.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          subcategories: { $addToSet: "$subcategory" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          category: "$_id",
+          subcategories: 1
+        }
+      },
+      {
+        $sort: { category: 1 }
+      }
+    ]);
+
+    res.status(200).json({data:categories});
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const getFood = async (req, res, next) => {
   try {
     const food = await Food.findById(req.params.id).populate('createdBy', 'fullName email');

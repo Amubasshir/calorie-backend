@@ -5,9 +5,9 @@ import AppError from '../utils/appError.js';
 // Cookie options
 const cookieOptions = {
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-    httpOnly: true,
+    // httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    // sameSite: 'strict'
 };
 
 export const register = async (req, res, next) => {
@@ -74,7 +74,7 @@ export const login = async (req, res, next) => {
         res.cookie('jwt', token, cookieOptions);
         res.status(200).json({
             status: 'success',
-            data: { user }
+            data: { user, token }
         });
     } catch (error) {
         next(error);
