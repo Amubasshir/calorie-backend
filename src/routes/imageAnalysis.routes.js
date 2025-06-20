@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadMiddleware } from '../controllers/image.controller.js';
+import { uploadImage, uploadMiddleware } from '../controllers/image.controller.js';
 import {
     analyzeImageHandler,
     getAnalysis,
@@ -11,7 +11,9 @@ const router = express.Router();
 
 router.use(protect);
 
-router.post('/analyze', uploadMiddleware, analyzeImageHandler);
+// router.post('/analyze', uploadMiddleware, analyzeImageHandler);
+// router.post('/analyze', uploadImage, analyzeImageHandler);
+router.post('/analyze', analyzeImageHandler);
 router.get('/analysis/:id', getAnalysis);
 router.get('/analyses', listAnalyses);
 

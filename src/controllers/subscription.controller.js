@@ -18,6 +18,8 @@ export const createCheckoutSession = async (req, res, next) => {
   try {
     const { planCode } = req.body;
     const plan = await SubscriptionPlan.findOne({ planCode });
+    
+    console.log('Plan found:', plan, planCode);
     if (!plan) return next(new AppError('Plan not found', 404));
 
     // Create Stripe customer if not exists

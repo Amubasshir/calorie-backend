@@ -1,12 +1,14 @@
 import ImageAnalysis from '../models/imageAnalysis.model.js';
 import UserSubscription from '../models/userSubscription.model.js';
 import AppError from '../utils/appError.js';
+import { uploadToCloudinary } from '../utils/cloudinary.js';
 import { uploadToR2 } from '../utils/r2.js';
 import { analyzeImage } from '../utils/visionApi.js';
+import { uploadImage } from './image.controller.js';
 
 export const analyzeImageHandler = async (req, res, next) => {
     try {
-        if (!req.file) {
+        if (!req.body.file) {
             return next(new AppError('No image file provided', 400));
         }
 
@@ -17,7 +19,9 @@ export const analyzeImageHandler = async (req, res, next) => {
         }
 
         // Upload image to storage
-        const imageUrl = await uploadToR2(req.file);
+        // const imageUrl = await uploadToR2(req.file);
+        // const imageUrl = await uploadImage(req.body.file);
+        const imageUrl = await uploadToCloudinary(req.body.file);
 
         // Create analysis record
         const analysis = await ImageAnalysis.create({

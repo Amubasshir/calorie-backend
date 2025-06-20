@@ -27,6 +27,8 @@ export const getFoods = async (req, res, next) => {
       maxProtein
     } = req.query;
 
+    console.log({query});
+
     const skip = (page - 1) * limit;
     let queryObj = {};
     let foods;
@@ -74,13 +76,14 @@ export const getFoods = async (req, res, next) => {
     // If no results found and there's a search query, try AI generation
     if (foods.length === 0 && query) {
       // Check user's subscription status for AI generation
-      const userSub = await UserSubscription.findOne({ user: req.user._id }).populate('plan');
+    //   const userSub = await UserSubscription.findOne({ user: req.user._id }).populate('plan');
       
-      if (!userSub || !userSub.plan.features.customFoodAddition) {
-        return next(new AppError('Upgrade to premium to access AI-generated food data', 403));
-      }
+    //   if (!userSub || !userSub.plan.features.customFoodAddition) {
+    //     return next(new AppError('Upgrade to premium to access AI-generated food data', 403));
+    //   }
 
       const aiGeneratedFood = await generateFoodData(query);
+      console.log("👍👍👍", {aiGeneratedFood});
       
       if (aiGeneratedFood) {
         const newFood = await Food.create({
