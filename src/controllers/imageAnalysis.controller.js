@@ -7,6 +7,7 @@ import { analyzeImage } from '../utils/visionApi.js';
 import { uploadImage } from './image.controller.js';
 
 export const analyzeImageHandler = async (req, res, next) => {
+    console.log("body", req.body);
     try {
         if (!req.body.file) {
             return next(new AppError('No image file provided', 400));
@@ -39,14 +40,15 @@ export const analyzeImageHandler = async (req, res, next) => {
             const identifiedItems = await analyzeImage(imageUrl, analysis.expectedItems);
             
             // Update analysis with results
-            analysis.identifiedItems = identifiedItems;
-            analysis.status = 'completed';
-            analysis.processingTime = Date.now() - startTime;
-            await analysis.save();
+            // analysis.identifiedItems = identifiedItems;
+            // analysis.status = 'completed';
+            // analysis.processingTime = Date.now() - startTime;
+            // await analysis.save();
 
             res.status(200).json({
                 status: 'success',
-                data: { analysis }
+                // data: { analysis }
+                data: identifiedItems
             });
         } catch (error) {
             analysis.status = 'failed';

@@ -27,7 +27,6 @@ export const getFoods = async (req, res, next) => {
       maxProtein
     } = req.query;
 
-    console.log({query});
 
     const skip = (page - 1) * limit;
     let queryObj = {};
@@ -83,7 +82,6 @@ export const getFoods = async (req, res, next) => {
     //   }
 
       const aiGeneratedFood = await generateFoodData(query);
-      console.log("👍👍👍", {aiGeneratedFood});
       
       if (aiGeneratedFood) {
         const newFood = await Food.create({

@@ -33,7 +33,7 @@ const limiter = rateLimit({
 app.use('/api/auth', limiter);
 
 // Body parser
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
