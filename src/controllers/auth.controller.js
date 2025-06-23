@@ -5,9 +5,11 @@ import AppError from '../utils/appError.js';
 // Cookie options
 const cookieOptions = {
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-    // httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    // secure: process.env.NODE_ENV === 'production',
     // sameSite: 'strict'
+    secure: true,
+    sameSite: 'none'
 };
 
 export const register = async (req, res, next) => {
